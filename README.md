@@ -65,7 +65,7 @@ If you have any questions related to the code or the paper, feel free to email D
 Please cite our paper if you find the repo helpful in your work:
 
 ```bibtex
-@article{nguyen2024memory,
+@article{nguyen2025mini,
   title = {Mini-batch Coresets for Memory-efficient Language Model Training on Data Mixtures},
   author = {Nguyen, Dang and Yang, Wenhan and Anand, Rathul and Yang, Yu and Mirzasoleiman, Baharan},
   journal = {International Conference on Learning Representations (ICLR)},

@@ -1,6 +1,6 @@
 # CoLM
 ![Python 3.10](https://img.shields.io/badge/python-3.10-green)
-![Pytorch 2.4.0](https://img.shields.io/badge/pytorch-2.4.0-green)
+![Pytorch 2.2.1](https://img.shields.io/badge/pytorch-2.2.1-green)
 ![License MIT](https://img.shields.io/badge/license-MIT-blue)
 
 This repository is the official implementation of our ICLR 2025 paper [Mini-batch Coresets for Memory-efficient Language Model Training on Data Mixtures](https://arxiv.org/pdf/2407.19580).
@@ -10,11 +10,11 @@ This repository is the official implementation of our ICLR 2025 paper [Mini-batc
   - [🔗 Quick Links](#-quick-links)
   - [Install Requirements](#install-requirements)
   - [Data Preparation](#data-preparation)
-  - [Data Selection Pipeline](#data-selection-pipeline)
+  - [Training](#training)
   - [Evaluation](#evaluation)
   - [Bugs or Questions?](#bugs-or-questions)
   - [Citation](#citation)
-  - [Acknowledgments](#acknowledgments)
+  - [Acknowledgements](#acknowledgements)
 
 
 ## Install Requirements
@@ -37,13 +37,20 @@ cd ..
 pip install -e .
 ```
 
-## Data Preparation
-Please download MathInstruct dataset with additional annotations [here](https://drive.google.com/file/d/1kpYMJ0xrn0eLyv-uwhUZCTjFWT6Zlb-Q/view?usp=sharing) and store it under the following path `/data/MathInstruct.jsonl`.
+Note: Our implementation is tied to `transformers==4.43.2`. If you’re using a different `transformers` version or different model architectures, you may need to upgrade the libraries and modify the following files accordingly:
+- colm/custom_phi.py
+- colm/subset_trainer_distributed.py
+- colm/train.py
 
-## Data Selection Pipeline
+## Data Preparation
+Please download MathInstruct and SuperGLUE datasets with additional annotations[here](https://drive.google.com/file/d/1kpYMJ0xrn0eLyv-uwhUZCTjFWT6Zlb-Q/view?usp=sharing) and store it under the following path `/data/*.jsonl`.
+
+## Training
 ```bash
-bash scripts/run_math.sh
+bash scripts/run_math_efficient.sh
 ```
+
+Note: We implement CoLM with an efficient last-layer zeroth-order gradient estimation that requires approximately only one forward pass of the model. While the selection time is negligible (<0.1s), CoLM still introduces additional overhead, such as synchronizing gradients before selection, broadcasting selected indices back, padding after selection (which can make some samples longer), transferring tensors between CPU and GPU, context switching, and so on. In the paper, we report the ideal training time of our method which is the forward pass time for a batch size of 128 + the forward and backward pass time for a batch size of 64.
 
 ## Evaluation
 ```bash
@@ -58,7 +65,7 @@ If you have any questions related to the code or the paper, feel free to email D
 Please cite our paper if you find the repo helpful in your work:
 
 ```bibtex
-@article{nguyen2024mini,
+@article{nguyen2024memory,
   title = {Mini-batch Coresets for Memory-efficient Language Model Training on Data Mixtures},
   author = {Nguyen, Dang and Yang, Wenhan and Anand, Rathul and Yang, Yu and Mirzasoleiman, Baharan},
   journal = {International Conference on Learning Representations (ICLR)},
@@ -66,5 +73,5 @@ Please cite our paper if you find the repo helpful in your work:
 }
 ```
 
-## Acknowledgments  
+## Acknowledgements
 The structure of this repository is largely based on the official implementation of [LESS](https://github.com/princeton-nlp/LESS) and [MeZO](https://github.com/princeton-nlp/MeZO). We are grateful for their open sources.
